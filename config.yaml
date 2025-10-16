@@ -1,0 +1,67 @@
+# Configuration for the Agentic AI System
+
+# System Settings
+system:
+  name: "Sistema Agéntico Local"
+  version: "1.0.0"
+  max_concurrent_agents: 5
+  
+# AI Model Configuration
+ai_models:
+  default_provider: "openai"
+  openai:
+    model: "gpt-4"
+    temperature: 0.7
+    max_tokens: 2000
+  anthropic:
+    model: "claude-3-opus-20240229"
+    temperature: 0.7
+    max_tokens: 2000
+
+# Agent Configuration
+agents:
+  base_config:
+    max_iterations: 10
+    timeout: 300
+    retry_attempts: 3
+  
+  # Types of specialized agents
+  types:
+    - name: "market_research"
+      description: "Expert in market research and analysis"
+      skills: ["data_analysis", "trend_identification", "competitor_analysis"]
+    
+    - name: "content_creator"
+      description: "Expert in creating marketing content"
+      skills: ["copywriting", "seo", "storytelling"]
+    
+    - name: "sales_specialist"
+      description: "Expert in sales strategies and client acquisition"
+      skills: ["prospecting", "closing", "relationship_building"]
+    
+    - name: "technical_expert"
+      description: "Expert in technical implementation"
+      skills: ["coding", "system_design", "automation"]
+    
+    - name: "qa_validator"
+      description: "Expert in quality assurance and validation"
+      skills: ["testing", "validation", "error_detection"]
+
+# N8N Integration
+n8n:
+  enabled: true
+  webhook_url: "http://localhost:5678/webhook"
+  api_url: "http://localhost:5678/api/v1"
+  
+# Workflow Templates
+workflows:
+  client_acquisition:
+    steps:
+      - agent: "market_research"
+        task: "Identify target market and ideal clients"
+      - agent: "content_creator"
+        task: "Create compelling outreach content"
+      - agent: "sales_specialist"
+        task: "Execute outreach campaign"
+      - agent: "qa_validator"
+        task: "Validate all outputs before delivery"

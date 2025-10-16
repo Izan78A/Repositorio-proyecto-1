@@ -1,0 +1,81 @@
+{
+  "name": "Content Creation Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "content-creation",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "content-creation-start"
+    },
+    {
+      "parameters": {
+        "functionCode": "// Technical Expert - Setup automation\nconst technicalSetup = {\n  agent: 'technical_expert',\n  task: 'Configurar automatización de generación de contenido',\n  requirements: $input.item.json.requirements\n};\n\nreturn technicalSetup;"
+      },
+      "id": "technical-setup",
+      "name": "Technical Expert Agent",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Content Creator - Generate content\nconst contentGeneration = {\n  agent: 'content_creator',\n  task: 'Generar contenido basado en especificaciones',\n  specs: $input.item.json.specs,\n  automation: $node['Technical Expert Agent'].json\n};\n\nreturn contentGeneration;"
+      },
+      "id": "content-generation",
+      "name": "Content Creator Agent",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// QA Validator - Validate content\nconst validation = {\n  agent: 'qa_validator',\n  task: 'Validar calidad del contenido generado',\n  content: $node['Content Creator Agent'].json\n};\n\nreturn validation;"
+      },
+      "id": "qa-validation",
+      "name": "QA Validator Agent",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}"
+      },
+      "id": "response",
+      "name": "Send Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1050, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [[{"node": "Technical Expert Agent", "type": "main", "index": 0}]]
+    },
+    "Technical Expert Agent": {
+      "main": [[{"node": "Content Creator Agent", "type": "main", "index": 0}]]
+    },
+    "Content Creator Agent": {
+      "main": [[{"node": "QA Validator Agent", "type": "main", "index": 0}]]
+    },
+    "QA Validator Agent": {
+      "main": [[{"node": "Send Response", "type": "main", "index": 0}]]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "versionId": "1",
+  "id": "content-creation-workflow",
+  "meta": {
+    "instanceId": "local-agentic-system"
+  },
+  "tags": []
+}
