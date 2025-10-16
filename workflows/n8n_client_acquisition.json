@@ -1,0 +1,94 @@
+{
+  "name": "Client Acquisition Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "client-acquisition",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "client-acquisition-start"
+    },
+    {
+      "parameters": {
+        "functionCode": "// Market Research Agent\nconst marketResearch = {\n  agent: 'market_research',\n  task: 'Identificar mercado objetivo y clientes ideales',\n  niche: $input.item.json.niche,\n  industry: $input.item.json.industry\n};\n\nreturn marketResearch;"
+      },
+      "id": "market-research",
+      "name": "Market Research Agent",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Content Creator Agent\nconst contentCreation = {\n  agent: 'content_creator',\n  task: 'Crear contenido persuasivo para outreach',\n  targetMarket: $input.item.json.targetMarket,\n  valueProposition: $input.item.json.valueProposition\n};\n\nreturn contentCreation;"
+      },
+      "id": "content-creator",
+      "name": "Content Creator Agent",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Sales Specialist Agent\nconst salesStrategy = {\n  agent: 'sales_specialist',\n  task: 'Ejecutar campaña de prospección',\n  content: $input.item.json.content,\n  prospects: $input.item.json.prospects\n};\n\nreturn salesStrategy;"
+      },
+      "id": "sales-specialist",
+      "name": "Sales Specialist Agent",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// QA Validator Agent\nconst validation = {\n  agent: 'qa_validator',\n  task: 'Validar todos los outputs antes de entregar',\n  workToValidate: {\n    marketResearch: $node['Market Research Agent'].json,\n    content: $node['Content Creator Agent'].json,\n    salesStrategy: $node['Sales Specialist Agent'].json\n  }\n};\n\nreturn validation;"
+      },
+      "id": "qa-validator",
+      "name": "QA Validator Agent",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}"
+      },
+      "id": "response",
+      "name": "Send Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1250, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [[{"node": "Market Research Agent", "type": "main", "index": 0}]]
+    },
+    "Market Research Agent": {
+      "main": [[{"node": "Content Creator Agent", "type": "main", "index": 0}]]
+    },
+    "Content Creator Agent": {
+      "main": [[{"node": "Sales Specialist Agent", "type": "main", "index": 0}]]
+    },
+    "Sales Specialist Agent": {
+      "main": [[{"node": "QA Validator Agent", "type": "main", "index": 0}]]
+    },
+    "QA Validator Agent": {
+      "main": [[{"node": "Send Response", "type": "main", "index": 0}]]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "versionId": "1",
+  "id": "client-acquisition-workflow",
+  "meta": {
+    "instanceId": "local-agentic-system"
+  },
+  "tags": []
+}
